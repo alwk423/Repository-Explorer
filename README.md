@@ -25,8 +25,13 @@ always uses the latest code.
 ## Usage
 
 ```bash
-repomap .            # overview: directory tree + stats for the current repo
+repomap .                        # overview: directory tree + stats for the current repo
 repomap /path/to/repo
+repomap deps                     # repo-wide summary: dependency/dependent counts per Python file
+repomap deps src/pkg/module.py   # dependencies/dependents of one Python file
+repomap deps module.py --root /path/to/repo
+repomap graph                    # tree view of each Python file and what it imports
+repomap graph --root /path/to/repo
 ```
 
 Ignores `.git`, `node_modules`, virtualenvs, build artifacts, and anything
@@ -41,6 +46,17 @@ matched by the target repo's `.gitignore`.
   Go, Rust, and more).
 - **Categories** — file count by role: source, test, config, docs, other.
 - **Largest files** — the biggest files in the repo, for spotting bloat.
+- **Dependencies/dependents** (`repomap deps <file>`) — for a given Python
+  file, which repo-local files it imports and which repo-local files import
+  it. Resolves both absolute (`import pkg.module`) and relative
+  (`from . import module`) imports statically via `ast`; external/stdlib
+  imports are ignored since they're not part of the repo.
+- **Dependency graph** (`repomap graph`) — every Python file in the repo as
+  a tree, with its repo-local imports nested underneath it.
+
+`deps` and `graph` are Python-only: import resolution is done with the `ast`
+module, so files in other languages are scanned for the tree/stats above but
+not included in either command's output.
 
 ## Run tests
 
